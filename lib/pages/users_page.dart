@@ -1,5 +1,7 @@
 import 'package:chat_app/models/users.dart';
+import 'package:chat_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class UsersPage extends StatefulWidget {
@@ -14,25 +16,32 @@ class _UsersPageState extends State<UsersPage> {
       RefreshController(initialRefresh: false);
 
   final users = [
-    User(online: true, email: 'rome@hotmail.com', name: 'Romelia', uid: '1'),
-    User(online: false, email: 'rose@hotmail.com', name: 'Rosa', uid: '2'),
-    User(online: true, email: 'mrta@hotmail.com', name: 'Martha', uid: '3'),
-    User(online: true, email: 'marce@hotmail.com', name: 'Marcela', uid: '4'),
+    Usuario(online: true, email: 'rome@hotmail.com', name: 'Romelia', uid: '1'),
+    Usuario(online: false, email: 'rose@hotmail.com', name: 'Rosa', uid: '2'),
+    Usuario(online: true, email: 'mrta@hotmail.com', name: 'Martha', uid: '3'),
+    Usuario(
+        online: true, email: 'marce@hotmail.com', name: 'Marcela', uid: '4'),
   ];
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+    final user = authService.usuario;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
-          'User name',
-          style: TextStyle(color: Colors.black87),
+        title: Text(
+          user.name,
+          style: const TextStyle(color: Colors.black87),
         ),
         elevation: 1,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.exit_to_app, color: Colors.black87),
-          onPressed: () {},
+          onPressed: () {
+            // TODO: Desconectar del SocketServer
+            Navigator.pushReplacementNamed(context, 'login');
+            AuthService.deleteToken();
+          },
         ),
         actions: <Widget>[
           Container(
@@ -70,7 +79,7 @@ class _UsersPageState extends State<UsersPage> {
     );
   }
 
-  ListTile _userListTile(User user) {
+  ListTile _userListTile(Usuario user) {
     return ListTile(
       title: Text(user.name),
       subtitle: Text(user.email),
